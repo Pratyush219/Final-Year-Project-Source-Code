@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-FILENAME = '../data/diabetes.csv'
 def floor(l: list, key):
     left = 0
     right = len(l) - 1
@@ -28,8 +27,7 @@ def discretize_data(data: pd.DataFrame, k: int):
         for i in range(0, size, interval_size):
             if sorted_data[i] not in cut_points:
                 cut_points.append(sorted_data[i])
-            
-        print(col, cut_points)
+                
         for pos, val in enumerate(transformed_data[col]):
             try:
                 split_pos = floor(cut_points, val)
@@ -42,12 +40,3 @@ def discretize_data(data: pd.DataFrame, k: int):
                 print(pos, col, val, split_pos, len(cut_points))
             # print(pos, col)
     return transformed_data
-def main():
-    data = load_data(FILENAME)
-    data.dropna(inplace=True)
-    num_intervals = 5
-    # for col in data.columns[:-1]:
-    #     data[col] = data[col].astype(float)
-    transformed_data = discretize_data(data, num_intervals)
-    print(transformed_data)
-main()
