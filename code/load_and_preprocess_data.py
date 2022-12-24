@@ -57,7 +57,7 @@ def discretize_data(data: pd.DataFrame, k: int):
             # print(pos, col)
     return transformed_data
 def get_label_appended_data(data: pd.DataFrame):
-    for col in data.columns[:-1]:
+    for col in data.columns:
         for pos, val in enumerate(data[col]):
             data.loc[pos, col] = f'{val},{col}'
     return data

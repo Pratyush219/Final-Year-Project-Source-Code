@@ -61,3 +61,10 @@ def get_frequent(itemsets, transactions, min_support, prev_discarded):
             else:
                 new_discarded.append(itemset)
     return L, supp_count, new_discarded
+
+def generate_features(rules, order):
+    features = []
+    for rule in rules:
+        if len(rule[1]) == 1 and list(rule[1])[0].split(',')[1] == order[-1]:
+            features.append(rule[0])
+    return features
