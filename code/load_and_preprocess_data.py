@@ -41,7 +41,6 @@ def discretize_data(data: pd.DataFrame, k: int):
             if sorted_data[i] not in value_added:
                 split_points.append(sorted_data[i])
                 value_added.add(sorted_data[i])
-
         for pos, val in enumerate(transformed_data[col]):
             # Used try except for debuggind purpose. Consider removing it in the future.
             try:
@@ -57,3 +56,8 @@ def discretize_data(data: pd.DataFrame, k: int):
                 print(pos, col, val, split_pos, len(split_points))
             # print(pos, col)
     return transformed_data
+def get_label_appended_data(data: pd.DataFrame):
+    for col in data.columns[:-1]:
+        for pos, val in enumerate(data[col]):
+            data.loc[pos, col] = f'{val},{col}'
+    return data
