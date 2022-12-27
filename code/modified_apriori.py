@@ -5,12 +5,14 @@ import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
 path_to_data = '../data/diabetes.csv'
-min_support = 0.2
+min_support = 0.1
 min_confidence = 0.02
+n_supp = 30
+n_conf = 50
 
 data = load_data(path_to_data)
 order = [col for col in data.columns]
-transformed_data = discretize_data(data, 5)
+transformed_data = get_label_appended_data(data)
 
 transactions = transformed_data.to_numpy()
 # print(transactions)
@@ -19,7 +21,6 @@ transactions = transformed_data.to_numpy()
 C = {}
 L = {}
 itemset_size = 1
-discarded = {itemset_size: []}
 items = []
 itemsSet = set()
 for transaction in transactions:
@@ -28,7 +29,10 @@ for transaction in transactions:
 # print(itemsSet)
 items = [[item] for item in itemsSet]
 items.sort(key = lambda x: order.index(x[0].split(',')[0]))
+# print(items)
 C.update({itemset_size: items})
+# print(items)
+# print(C[itemset_size])
 # pprint.pprint(C[1])
 
 def print_table(T, supp_count):
@@ -39,35 +43,33 @@ def print_table(T, supp_count):
     print()
 
 supp_count_L = {}
-f, sup, new_discarded = get_frequent(C[itemset_size], transactions, min_support, discarded)
-discarded.update({itemset_size: new_discarded})
-L.update({itemset_size: f})
-supp_count_L.update({itemset_size: sup})
+frequent, support = modified_get_frequent(items, transactions, n_supp, order)
+L.update({itemset_size: frequent})
+supp_count_L.update({itemset_size: support})
 
-print_table(L[1], supp_count_L[1])
+# print_table(L[1], supp_count_L[1])
 # pprint.pprint(items)
 
 k = itemset_size + 1
 convergence = False
 while convergence == False:
     C.update({k: join_set_itemsets(L[k - 1], order)})
-    # print(f'Table C{k}: \n')
-    # print(len(C[k]))
-    # print_table(C[k], [count_occurences(it, transactions) for it in C[k]])
-    f, sup, new_discarded = get_frequent(C[k], transactions, min_support, discarded)
-    discarded.update({k: new_discarded})
-    L.update({k: f})
-    supp_count_L.update({k: sup})
+    # print(C[k])
+    print(f'Table C{k}: \n')
+    print(len(C[k]))
+    print_table(C[k], [count_occurences(it, transactions) for it in C[k]])
+    frequent, support = modified_get_frequent(C[k], transactions, n_supp, order)
+    L.update({k: frequent})
+    supp_count_L.update({k: support})
     if len(L[k]) == 0:
         convergence = True
     else:
-        # print(f'Table L{k}: \n')
-        # print(len(L[k]))
-        # print_table(L[k], supp_count_L[k])
+        print(f'Table L{k}: \n')
+        print(len(L[k]))
+        print_table(L[k], supp_count_L[k])
         pass
     k += 1
 
-# pprint.pprint(L[k - 2])
 
 
 # ## Generate Rules
@@ -85,6 +87,7 @@ def write_rules(X, X_S, S, conf, supp, lift, num_transactions):
     out_rules += f'\tSupp: {(supp/num_trans):2.3f} '
     out_rules += f'\tLift: {lift:2.3f}\n'
     return out_rules, rule
+
 
 assoc_rules_str = ''
 rules_list = []
@@ -104,16 +107,16 @@ for i in range(1, len(L)):
                 conf = sup_x/count_occurences(S, transactions)
                 lift = sup_x/(sup_x_s/num_trans)
                 if conf >= min_confidence and sup_x >= min_support:
-                    rule_output, rule = write_rules(X, X_S, S, conf, sup_x, lift, num_trans)
+                    rule_output, rule = write_rules(list(X), list(X_S), list(S), conf, sup_x, lift, num_trans)
                     # print(rule_output)
                     assoc_rules_str += rule_output
                     rules_list.append(rule)
 
-# print(assoc_rules_str)
+print(assoc_rules_str)
 
 for rule in rules_list:
     if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
         # print(rule)
         pass
 
-# print(generate_features(rules_list, order))
+pprint.pprint(generate_features(rules_list, order))
