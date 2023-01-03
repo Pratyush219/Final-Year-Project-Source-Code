@@ -65,9 +65,7 @@ def get_frequent(itemsets, transactions, min_support, prev_discarded):
 def modified_get_frequent(itemsets, transactions, n_itemsets, order):
     # Store the support counts of all the itemsets
     support_counts_for_items = [(itemset, count_occurences(itemset, transactions)) for itemset in itemsets]
-    # heapq implements min-heap by default but we want a max-heap. In order to simulate that 
-    # behaviour, we multiply the support counts with -1. The most negative value will be the 
-    # minimum and will be at the top of the heap.
+    # heapq implements min-heap by default but we want a max-heap. In order to simulate that behaviour, we multiply the support counts with -1. The most negative value will be the minimum and will be at the top of the heap.
     counts = [-item[1] for item in support_counts_for_items]
 
     # heapify the counts list
