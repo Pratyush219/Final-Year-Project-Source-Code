@@ -1,6 +1,5 @@
 import numpy as np
 import heapq
-import pprint
 def load_transactions(path_to_data, order):
     transactions = []
     with open(path_to_data, 'r') as fid:
@@ -64,37 +63,50 @@ def get_frequent(itemsets, transactions, min_support, prev_discarded):
     return L, supp_count, new_discarded
 
 def modified_get_frequent(itemsets, transactions, n_itemsets, order):
+    # Store the support counts of all the itemsets
     support_counts_for_items = [(itemset, count_occurences(itemset, transactions)) for itemset in itemsets]
+    # heapq implements min-heap by default but we want a max-heap. In order to simulate that 
+    # behaviour, we multiply the support counts with -1. The most negative value will be the 
+    # minimum and will be at the top of the heap.
     counts = [-item[1] for item in support_counts_for_items]
-    support_counts_for_items.sort(key=lambda x: x[1], reverse=True)
-    heapq.heapify(counts)
-    # pprint.pprint(support_counts_for_items)
-    # print(counts)
-    frequent_itemsets = list()
-    frequent = list()
-    support = list()
-    added = set()
-    pops = 0
-    while pops < n_itemsets and len(counts) != 0:
-        count = heapq.heappop(counts)
-        pops += 1
-        for item, supp in support_counts_for_items:
-            if supp == -count and not set(item).issubset(added):
-                frequent_itemsets.append([item, supp])
-                added.add(item[0])
 
-    frequent_itemsets.sort(key=lambda x: tuple(order.index(d.split(',')[0]) for d in x[0]))
-    # print(frequent_itemsets)
-    frequent = [entry[0] for entry in frequent_itemsets]
-    support = [entry[1] for entry in frequent_itemsets]
-    # print(frequent)
-    # print(support)
-    return frequent, support
+    # heapify the counts list
+    heapq.heapify(counts)
+    # Stores the list of frequent itemsets along with their support
+    frequent_itemsets_with_support = list() 
+    # Stores the list of frequent itemsets
+    frequent_itemsets = list()
+    # Stores the list of support counts of frequent itemsets
+    support = list()
+    # A set that is used to track whether an itemset has already been added to frequent_itemsets
+    added = set()
+    num_itemsets_added = 0
+    while num_itemsets_added < n_itemsets and len(counts) != 0:
+        count = heapq.heappop(counts)
+        # Iterate through all the itemsets
+        for item, supp in support_counts_for_items:
+            # If support of current itemset is equal to count and it has not been added to frequent_itemsets
+            if supp == -count and str(item) not in added:
+                frequent_itemsets_with_support.append([item, supp])
+                added.add(str(item))
+        num_itemsets_added += 1
+
+    # Sort the itemsets in the correct order ot allow joining of itemsets
+    frequent_itemsets_with_support.sort(key=lambda x: tuple(order.index(d.split(',')[0]) for d in x[0]))
+    # First item of each entry is an itemset
+    frequent_itemsets = [entry[0] for entry in frequent_itemsets_with_support]
+    # Second item of each entry is support count
+    support = [entry[1] for entry in frequent_itemsets_with_support]
+    return frequent_itemsets, support
+
 def get_confident_rules(itemsets, supp_count):
+    #TODO: Generate confident rules based on the algorithm in the base paper
+
     pass
 def generate_features(rules, order):
     features = []
     for rule in rules:
+        # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == 'Outcome':
             features.append(rule[0])
     return (features)
