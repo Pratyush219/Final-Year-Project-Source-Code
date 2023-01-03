@@ -95,5 +95,6 @@ def get_confident_rules(itemsets, supp_count):
 def generate_features(rules, order):
     features = []
     for rule in rules:
-        features.append(rule[0])
+        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == 'Outcome':
+            features.append(rule[0])
     return (features)
