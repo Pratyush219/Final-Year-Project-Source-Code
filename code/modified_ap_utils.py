@@ -1,5 +1,19 @@
 import numpy as np
 import heapq
+from itertools import combinations, chain
+
+class Rule:
+    def __init__(self, itemset: set, left: set, right: set, supp, conf, lift) -> None:
+        self.itemset = itemset
+        self.left = left
+        self.right = right
+        self.conf = conf
+        self.supp = supp
+        self.lift = lift
+
+    
+def powerset(s):
+    return list(chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1)))
 def load_transactions(path_to_data, order):
     transactions = []
     with open(path_to_data, 'r') as fid:
@@ -41,28 +55,9 @@ def join_set_itemsets(itemsets, order):
                 C.append(item_out)
     return C
 
-def get_frequent(itemsets, transactions, min_support, prev_discarded):
-    L = []
-    supp_count = []
-    new_discarded = []
-    k = len(prev_discarded)
-    for itemset in itemsets:
-        discarded_before = False
-        if k > 0:
-            for item in prev_discarded[k]:
-                if set(item).issubset(set(itemset)):
-                    discarded_before = True
-                    break
-        if not discarded_before:
-            count = count_occurences(itemset, transactions)
-            if count/len(transactions) >= min_support:
-                L.append(itemset)
-                supp_count.append(count)
-            else:
-                new_discarded.append(itemset)
-    return L, supp_count, new_discarded
 
-def modified_get_frequent(itemsets, transactions, n_itemsets, order):
+
+def get_frequent(itemsets, transactions, n_itemsets, order):
     # Store the support counts of all the itemsets
     support_counts_for_items = [(itemset, count_occurences(itemset, transactions)) for itemset in itemsets]
     # heapq implements min-heap by default but we want a max-heap. In order to simulate that behaviour, we multiply the support counts with -1. The most negative value will be the minimum and will be at the top of the heap.
@@ -97,10 +92,28 @@ def modified_get_frequent(itemsets, transactions, n_itemsets, order):
     support = [entry[1] for entry in frequent_itemsets_with_support]
     return frequent_itemsets, support
 
-def get_confident_rules(itemsets, supp_count):
+def get_confident_rules(L, n_rules, transactions):
     #TODO: Generate confident rules based on the algorithm in the base paper
-    
-    pass
+    rules = []
+    num_trans = len(transactions)
+    for j in range(len(L)):
+        s = list(powerset(set(L[j])))
+        s.pop()
+        for z in s:
+            S = set(z)
+            X = set(L[j])
+            X_S = set(X - S)
+            # if len(X_S) == 1 and list(X_S)[0].split(',')[0] == 'Outcome':
+            # print(X_S)
+            sup_x = count_occurences(X, transactions)
+            sup_x_s = count_occurences(X_S, transactions)
+            conf = sup_x/count_occurences(S, transactions)
+            lift = sup_x/(sup_x_s/num_trans)
+            rules.append(Rule(X, S, X_S, sup_x, conf, lift))
+    rules.sort(key=lambda x: x.conf)
+    return rules[:n_rules]
+
+            
 def generate_features(rules, order):
     features = []
     for rule in rules:
