@@ -4,9 +4,9 @@ import pandas as pd
 import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
-path_to_data = '../data/diabetes.csv'
-min_support = 0.2
-min_confidence = 0.2
+path_to_data = '../data/diabetes1.csv'
+min_support = 0.1
+min_confidence = 0.9
 
 data = load_data(path_to_data)
 order = [col for col in data.columns]
@@ -115,6 +115,7 @@ for i in range(1, len(L)):
                     rules_list.append(rule)
 
 print(assoc_rules_str)
+print(len(assoc_rules_str.split('\n')))
 
 for rule in rules_list:
     if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:

@@ -11,7 +11,7 @@ n_conf = 50
 data = load_data(path_to_data)
 order = [col for col in data.columns]
 transformed_data = get_label_appended_data(data)
-
+print(transformed_data.columns)
 transactions = transformed_data.to_numpy()
 
 C = {}
@@ -81,4 +81,4 @@ print(assoc_rules_str)
     # if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
         # print(rule)
 print("Features:")
-pprint.pprint(generate_features(rules_list, order))
+pprint.pprint(generate_features(rules_list, order, transformed_data.columns))

@@ -110,14 +110,14 @@ def get_confident_rules(L, n_rules, transactions):
             conf = sup_x/count_occurences(S, transactions)
             lift = sup_x/(sup_x_s/num_trans)
             rules.append(Rule(X, S, X_S, sup_x, conf, lift))
-    rules.sort(key=lambda x: x.conf)
+    rules.sort(key=lambda x: x.conf, reverse=True)
     return rules[:n_rules]
 
             
-def generate_features(rules, order):
+def generate_features(rules, order, columns):
     features = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
-        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == 'Outcome':
+        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == columns[-1]:
             features.append(rule[0])
     return (features)
