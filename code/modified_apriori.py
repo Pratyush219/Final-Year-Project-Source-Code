@@ -5,8 +5,8 @@ import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
 path_to_data = '../data/diabetes.csv'
-n_supp = 30
-n_conf = 50
+n_itemsets = 30
+n_rules = 50
 
 data = load_data(path_to_data)
 order = [col for col in data.columns]
@@ -34,7 +34,7 @@ def print_table(T, supp_count):
     print()
 
 supp_count_L = {}
-frequent, support = get_frequent(items, transactions, n_supp, order)
+frequent, support = get_frequent(items, transactions, n_itemsets, order)
 L.update({itemset_size: frequent})
 supp_count_L.update({itemset_size: support})
 
@@ -45,7 +45,7 @@ while convergence == False:
     print(f'Table C{k}: \n')
     print(len(C[k]))
     print_table(C[k], [count_occurences(it, transactions) for it in C[k]])
-    frequent, support = get_frequent(C[k], transactions, n_supp, order)
+    frequent, support = get_frequent(C[k], transactions, n_itemsets, order)
     L.update({k: frequent})
     supp_count_L.update({k: support})
     if len(L[k]) == 0:
