@@ -6,16 +6,16 @@ from load_and_preprocess_data import load_data, get_label_appended_data, discret
 
 path_to_data = '../data/diabetes.csv'
 n_itemsets = 30
-n_rules = 50
+n_rules = 15
 
-data = load_data(path_to_data)
+data = discretize_data(load_data(path_to_data), 8)
 order = [col for col in data.columns]
 transformed_data = get_label_appended_data(data)
 print(transformed_data.columns)
 transactions = transformed_data.to_numpy()
 
 C = {}
-L = {}
+frequent_itemsets = {}
 itemset_size = 1
 items = []
 itemsSet = set()
@@ -35,28 +35,35 @@ def print_table(T, supp_count):
 
 supp_count_L = {}
 frequent, support = get_frequent(items, transactions, n_itemsets, order)
-L.update({itemset_size: frequent})
+frequent_itemsets.update({itemset_size: frequent})
 supp_count_L.update({itemset_size: support})
 
 k = itemset_size + 1
 convergence = False
 while convergence == False:
-    C.update({k: join_set_itemsets(L[k - 1], order)})
+    C.update({k: join_set_itemsets(frequent_itemsets[k - 1], order)})
     print(f'Table C{k}: \n')
     print(len(C[k]))
     print_table(C[k], [count_occurences(it, transactions) for it in C[k]])
     frequent, support = get_frequent(C[k], transactions, n_itemsets, order)
-    L.update({k: frequent})
+    frequent_itemsets.update({k: frequent})
     supp_count_L.update({k: support})
-    if len(L[k]) == 0:
+    if len(frequent_itemsets[k]) == 0:
         convergence = True
     else:
         print(f'Table L{k}: \n')
-        print(len(L[k]))
-        print_table(L[k], supp_count_L[k])
+        print(len(frequent_itemsets[k]))
+        print_table(frequent_itemsets[k], supp_count_L[k])
         pass
     k += 1
 
+all_frequent_itemsets = []
+for size, itemsets in frequent_itemsets.items():
+    if size > 1:
+        all_frequent_itemsets += itemsets
+
+required_frequent_itemsets, support = get_frequent(all_frequent_itemsets, transactions, n_itemsets, order)
+pprint.pprint(required_frequent_itemsets)
 def write_rules(X, S, X_S, conf, supp, lift):
     out_rules = ''
     out_rules += f'Freq. Itemset: {X}\n'
@@ -70,15 +77,12 @@ def write_rules(X, S, X_S, conf, supp, lift):
 assoc_rules_str = ''
 rules_list = []
 num_trans = len(transactions)
-confident_rules = get_confident_rules(L[len(L) - 1], 10, transactions)
+confident_rules = get_confident_rules(frequent_itemsets, required_frequent_itemsets, n_rules, transactions)
 for rule in confident_rules:
     rules_list.append([list(rule.left), list(rule.right)])
     assoc_rules_str += write_rules(rule.itemset, rule.left, rule.right, rule.conf, rule.supp, rule.lift)
 
 print(assoc_rules_str)
 
-# for rule in rules_list:
-    # if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
-        # print(rule)
 print("Features:")
-pprint.pprint(generate_features(rules_list, order, transformed_data.columns))
+pprint.pprint(generate_features(rules_list, transformed_data.columns))
