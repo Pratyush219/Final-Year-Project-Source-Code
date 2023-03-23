@@ -1,5 +1,4 @@
 import load_and_preprocess_data as load
-import rule_generation as gen
 FILENAME = '../data/diabetes.csv'
 
 data = load.load_data(FILENAME)

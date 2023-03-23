@@ -1,14 +1,19 @@
 import numpy as np
 import heapq
-def load_transactions(path_to_data, order):
-    transactions = []
-    with open(path_to_data, 'r') as fid:
-        for lines in fid:
-            str_line = list(lines.strip().split(','))
-            _t = list(np.unique(str_line))
-            _t.sort(key = lambda x: order.index(x))
-            transactions.append(_t)
-    return transactions
+from itertools import combinations, chain
+
+class Rule:
+    def __init__(self, itemset: set, left: set, right: set, supp, conf, lift) -> None:
+        self.itemset = itemset
+        self.left = left
+        self.right = right
+        self.conf = conf
+        self.supp = supp
+        self.lift = lift
+
+    
+def powerset(s):
+    return list(chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1)))
 
 def count_occurences(itemset, transactions):
     count = 0
@@ -41,30 +46,18 @@ def join_set_itemsets(itemsets, order):
                 C.append(item_out)
     return C
 
-def get_frequent(itemsets, transactions, min_support, prev_discarded):
-    L = []
-    supp_count = []
-    new_discarded = []
-    k = len(prev_discarded)
-    for itemset in itemsets:
-        discarded_before = False
-        if k > 0:
-            for item in prev_discarded[k]:
-                if set(item).issubset(set(itemset)):
-                    discarded_before = True
-                    break
-        if not discarded_before:
-            count = count_occurences(itemset, transactions)
-            if count/len(transactions) >= min_support:
-                L.append(itemset)
-                supp_count.append(count)
-            else:
-                new_discarded.append(itemset)
-    return L, supp_count, new_discarded
 
-def modified_get_frequent(itemsets, transactions, n_itemsets, order):
+def calculate_confidence(left, itemset, transactions):
+    supp_itemset = count_occurences(itemset, transactions)
+    supp_left = count_occurences(left, transactions)
+    return supp_itemset/supp_left
+def get_frequent(itemsets, transactions, n_itemsets, order):
     # Store the support counts of all the itemsets
-    support_counts_for_items = [(itemset, count_occurences(itemset, transactions)) for itemset in itemsets]
+    support_counts_for_items = []
+    for itemset in itemsets:
+        support = count_occurences(itemset, transactions)
+        if support > 0:
+            support_counts_for_items.append((itemset, support))
     # heapq implements min-heap by default but we want a max-heap. In order to simulate that behaviour, we multiply the support counts with -1. The most negative value will be the minimum and will be at the top of the heap.
     counts = [-item[1] for item in support_counts_for_items]
 
@@ -97,14 +90,42 @@ def modified_get_frequent(itemsets, transactions, n_itemsets, order):
     support = [entry[1] for entry in frequent_itemsets_with_support]
     return frequent_itemsets, support
 
-def get_confident_rules(itemsets, supp_count):
+def get_confident_rules(L, frequent_itemsets, n_rules, transactions):
     #TODO: Generate confident rules based on the algorithm in the base paper
-    
-    pass
-def generate_features(rules, order):
+    rules = []
+    itemsets_considered = []
+    num_trans = len(transactions)
+    for j in range(len(frequent_itemsets)):
+        s = list(powerset(set(frequent_itemsets[j])))
+        s.pop()
+        curr_rules = []
+        should_consider_this_itemset = True
+        for z in s:
+            S = set(z)
+            X = set(frequent_itemsets[j])
+            X_S = set(X - S)
+            if len(S) > 0 and S in itemsets_considered:
+                should_consider_this_itemset = False
+                break
+            sup_x = count_occurences(X, transactions)
+            sup_x_s = count_occurences(X_S, transactions)
+            conf = calculate_confidence(S, X, transactions)
+            lift = sup_x/(sup_x_s/num_trans)
+            curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
+        if should_consider_this_itemset:
+            print(frequent_itemsets[j], "considered")
+            rules += curr_rules
+        else:
+            print(frequent_itemsets[j], "not considered")
+    rules.sort(key=lambda x: x.conf, reverse=True)
+    print("Intermediate rules:")
+    print(rules)
+    return rules[:n_rules]
+
+def generate_features(rules, columns):
     features = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
-        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == 'Outcome':
+        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == columns[-1]:
             features.append(rule[0])
     return (features)
