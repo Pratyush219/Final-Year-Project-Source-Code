@@ -10,9 +10,9 @@ data = load_data(path_to_data)
 print('Data loaded')
 order = [col for col in data.columns]
 transformed_data = get_label_appended_data(data)
-# print(transformed_data)
+print(transformed_data)
 print('data transformed')
-print(transformed_data.columns)
+#print(transformed_data.columns)
 transactions = transformed_data.to_numpy()
 print(transactions)
 
