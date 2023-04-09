@@ -1,6 +1,4 @@
 from modified_ap_utils import *
-import numpy as np
-import pandas as pd
 import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
@@ -78,7 +76,7 @@ def write_rules(rule: Rule):
 assoc_rules_str = ''
 rules_list = []
 num_trans = len(transactions)
-confident_rules = get_confident_rules(frequent_itemsets[k - 1], n_rules, transactions)
+confident_rules = get_confident_rules(frequent_itemsets[k - 1], n_rules, transactions, order[-1])
 for rule in confident_rules:
     rules_list.append([list(rule.left), list(rule.right)])
     assoc_rules_str += write_rules(rule)

@@ -91,29 +91,24 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     support = [entry[1] for entry in frequent_itemsets_with_support]
     return frequent_itemsets, support
 
-def get_confident_rules(frequent_itemsets, n_rules, transactions):
+def get_confident_rules(frequent_itemsets, n_rules, transactions, class_label):
     rules = []
-    itemsets_considered = []
     num_trans = len(transactions)
     for j in range(len(frequent_itemsets)):
         s = list(powerset(frequent_itemsets[j]))
         s.pop()
         curr_rules = []
-        should_consider_this_itemset = True
         for z in s:
             S = frozenset(z)
-            X = frozenset(frequent_itemsets[j])
+            X = frequent_itemsets[j]
             X_S = frozenset(X - S)
-            if len(S) > 0 and S in itemsets_considered:
-                should_consider_this_itemset = False
-                break
-            sup_x = count_occurences(X, transactions)
-            sup_x_s = count_occurences(X_S, transactions)
-            conf = calculate_confidence(S, X, transactions)
-            lift = sup_x/(sup_x_s/num_trans)
-            curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
-        if should_consider_this_itemset:
-            rules += curr_rules
+            if len(X_S) == 1 and list(X_S)[0].split(',')[0] == class_label:
+                sup_x = count_occurences(X, transactions)
+                sup_x_s = count_occurences(X_S, transactions)
+                conf = calculate_confidence(S, X, transactions)
+                lift = sup_x/(sup_x_s/num_trans)
+                curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
+        rules += curr_rules
     rules.sort(key=lambda x: x.conf, reverse=True)
     # print("Intermediate rules:")
     # print(rules)
