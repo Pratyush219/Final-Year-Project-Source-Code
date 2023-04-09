@@ -64,11 +64,12 @@ for size, itemsets in frequent_itemsets.items():
 
 required_frequent_itemsets, support = get_frequent(all_frequent_itemsets, transactions, n_itemsets, order)
 pprint.pprint(required_frequent_itemsets)
-def write_rules(X, S, X_S, conf, supp, lift):
+def write_rules(X, S, X_S, conf, rconf, supp, lift):
     out_rules = ''
     out_rules += f'Freq. Itemset: {X}\n'
     out_rules += f'\tRule: {S} -> {X_S}\n'
     out_rules += f'\tConf: {conf:2.3f} '
+    out_rules += f'\trConf: {rconf:2.3f}\n'
     out_rules += f'\tSupp: {(supp/num_trans):2.3f} '
     out_rules += f'\tLift: {lift:2.3f}\n'
     return out_rules
@@ -80,7 +81,7 @@ num_trans = len(transactions)
 confident_rules = get_confident_rules(frequent_itemsets, required_frequent_itemsets, n_rules, transactions)
 for rule in confident_rules:
     rules_list.append([list(rule.left), list(rule.right)])
-    assoc_rules_str += write_rules(rule.itemset, rule.left, rule.right, rule.conf, rule.supp, rule.lift)
+    assoc_rules_str += write_rules(rule.itemset, rule.left, rule.right, rule.conf, rule.rconf, rule.supp, rule.lift)
 
 print(assoc_rules_str)
 
