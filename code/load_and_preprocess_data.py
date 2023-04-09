@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pandas.api.types import is_numeric_dtype
 
 # Used to find floor of a number in a sorted list. 
 # floor is defined as the largest number not less than the given key
@@ -20,7 +21,7 @@ def floor(l: list, key):
 def load_data(path: str):
     data = pd.read_csv(path)
     data.dropna()
-    return data
+    return data.head(700)
 
 # This method is used to split the continuous values attributes in a finite number of intervals in order to assist in classification
 def discretize_data(data: pd.DataFrame, k: int):
@@ -31,7 +32,9 @@ def discretize_data(data: pd.DataFrame, k: int):
     interval_size = size//(k - 1)
     for col in transformed_data.columns[:-1]:
         # Sort the values in current column
-        sorted_data = sorted([float(val) for val in transformed_data[col]])
+        sorted_data = [val for val in transformed_data[col]]
+        if is_numeric_dtype(transformed_data[col]):
+            sorted_data = sorted([float(val) for val in transformed_data[col]])
         max_val = max(sorted_data)
         split_points = []
         # Use a set to ensure that one split point gets added to the split_points
@@ -54,10 +57,11 @@ def discretize_data(data: pd.DataFrame, k: int):
             except Exception as e:
                 print(e)
                 print(pos, col, val, split_pos, len(split_points))
-            # print(pos, col)
+                # print(pos, col)
     return transformed_data
 def get_label_appended_data(data: pd.DataFrame):
     for col in data.columns:
+        # print('Labelling: ', col)
         for pos, val in enumerate(data[col]):
             data.loc[pos, col] = f'{col},{val}'
     return data

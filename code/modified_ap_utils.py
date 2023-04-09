@@ -2,11 +2,12 @@ import numpy as np
 import heapq
 from itertools import combinations, chain
 
+support_counts = dict()
 class Rule:
     def __init__(self, itemset: set, left: set, right: set, supp, conf, lift) -> None:
-        self.itemset = itemset
-        self.left = left
-        self.right = right
+        self.itemset = list(itemset)
+        self.left = list(left)
+        self.right = list(right)
         self.conf = conf
         self.supp = supp
         self.lift = lift
@@ -16,34 +17,34 @@ def powerset(s):
     return list(chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1)))
 
 def count_occurences(itemset, transactions):
+    if itemset in support_counts:
+        return support_counts[itemset]
     count = 0
     for transaction in transactions:
-        if set(itemset).issubset(set(transaction)):
+        if itemset.issubset(set(transaction)):
             count += 1
+    support_counts[itemset] = count
     return count
 
-def join_two_itemsets(it1, it2, order):
-    it1.sort(key = lambda x: order.index(x.split(',')[0]))
-    it2.sort(key = lambda x: order.index(x.split(',')[0]))
+def join_two_itemsets(it1: frozenset, it2: frozenset, order):
+    combinedItemset = it1.union(it2)
+    labels1 = set([item.split(',')[0] for item in it1])
+    labels2 = set([item.split(',')[0] for item in it2])
 
-    for i in range(len(it1) - 1):
-        if it1[i] != it2[i]:
-            return []
-    split_str1 = it1[-1].split(',')
-    split_str2 = it2[-1].split(',')
-    id1 = order.index(split_str1[0])
-    id2 = order.index(split_str2[0])
-    if id1 < id2:
-        return it1 + [it2[-1]]
-    return []
+    labelsCombined = labels1.union(labels2)
+    if len(combinedItemset) == len(labelsCombined) == 1 + len(it1):
+        return frozenset(sorted(list(combinedItemset), key = lambda x: order.index(x.split(',')[0])))
+    return {}
 
 def join_set_itemsets(itemsets, order):
     C = []
+    itemsetsAdded = set()
     for i in range(len(itemsets)):
         for j in range(i + 1, len(itemsets)):
             item_out = join_two_itemsets(itemsets[i], itemsets[j], order)
-            if len(item_out) > 0:
+            if len(item_out) > 0 and frozenset(item_out) not in itemsetsAdded:
                 C.append(item_out)
+                itemsetsAdded.add(frozenset(item_out))
     return C
 
 
@@ -77,9 +78,9 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
         # Iterate through all the itemsets
         for item, supp in support_counts_for_items:
             # If support of current itemset is equal to count and it has not been added to frequent_itemsets
-            if supp == -count and str(item) not in added:
+            if supp == -count and item not in added:
                 frequent_itemsets_with_support.append([item, supp])
-                added.add(str(item))
+                added.add(item)
         num_itemsets_added += 1
 
     # Sort the itemsets in the correct order ot allow joining of itemsets
@@ -90,20 +91,19 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     support = [entry[1] for entry in frequent_itemsets_with_support]
     return frequent_itemsets, support
 
-def get_confident_rules(L, frequent_itemsets, n_rules, transactions):
-    #TODO: Generate confident rules based on the algorithm in the base paper
+def get_confident_rules(frequent_itemsets, n_rules, transactions):
     rules = []
     itemsets_considered = []
     num_trans = len(transactions)
     for j in range(len(frequent_itemsets)):
-        s = list(powerset(set(frequent_itemsets[j])))
+        s = list(powerset(frequent_itemsets[j]))
         s.pop()
         curr_rules = []
         should_consider_this_itemset = True
         for z in s:
-            S = set(z)
-            X = set(frequent_itemsets[j])
-            X_S = set(X - S)
+            S = frozenset(z)
+            X = frozenset(frequent_itemsets[j])
+            X_S = frozenset(X - S)
             if len(S) > 0 and S in itemsets_considered:
                 should_consider_this_itemset = False
                 break
@@ -113,13 +113,10 @@ def get_confident_rules(L, frequent_itemsets, n_rules, transactions):
             lift = sup_x/(sup_x_s/num_trans)
             curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
         if should_consider_this_itemset:
-            print(frequent_itemsets[j], "considered")
             rules += curr_rules
-        else:
-            print(frequent_itemsets[j], "not considered")
     rules.sort(key=lambda x: x.conf, reverse=True)
-    print("Intermediate rules:")
-    print(rules)
+    # print("Intermediate rules:")
+    # print(rules)
     return rules[:n_rules]
 
 def generate_features(rules, columns):
