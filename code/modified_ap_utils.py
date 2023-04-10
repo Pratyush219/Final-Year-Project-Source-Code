@@ -125,7 +125,7 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
                                 ordered_itemset(X, order), 
                                 ordered_itemset(S, order), 
                                 ordered_itemset(X_S, order), 
-                                sup_x, conf, lift))
+                                sup_x, conf, lift, rconf))
         rules += curr_rules
     rules.sort(key=lambda x: x.rconf, reverse=True)
     # print("Intermediate rules:")
