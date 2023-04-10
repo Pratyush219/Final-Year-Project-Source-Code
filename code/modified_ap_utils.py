@@ -12,7 +12,8 @@ class Rule:
         self.supp = supp
         self.lift = lift
 
-    
+def ordered_itemset(itemset, order):
+    return sorted(list(itemset), key = lambda x: order.index(x.split(",")[0]))
 def powerset(s):
     return list(chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1)))
 
@@ -33,18 +34,21 @@ def join_two_itemsets(it1: frozenset, it2: frozenset, order):
 
     labelsCombined = labels1.union(labels2)
     if len(combinedItemset) == len(labelsCombined) == 1 + len(it1):
-        return frozenset(sorted(list(combinedItemset), key = lambda x: order.index(x.split(',')[0])))
-    return {}
+        return combinedItemset
+    return frozenset()
 
-def join_set_itemsets(itemsets, order):
+def join_set_itemsets(itemsets, k, order):
     C = []
     itemsetsAdded = set()
-    for i in range(len(itemsets)):
-        for j in range(i + 1, len(itemsets)):
-            item_out = join_two_itemsets(itemsets[i], itemsets[j], order)
-            if len(item_out) > 0 and frozenset(item_out) not in itemsetsAdded:
+    itemsetsToBeJoined = []
+    for itemset in itemsets:
+        if len(itemset) == k:
+            itemsetsToBeJoined.append(itemset)
+    for i in range(len(itemsetsToBeJoined)):
+        for j in range(i + 1, len(itemsetsToBeJoined)):
+            item_out = join_two_itemsets(itemsetsToBeJoined[i], itemsetsToBeJoined[j], order)
+            if len(item_out) > 0:
                 C.append(item_out)
-                itemsetsAdded.add(frozenset(item_out))
     return C
 
 
@@ -57,7 +61,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     #support_counts_for_items = []
     support_counts_for_items = {}
     for itemset in itemsets:
-        class_label = sorted(list(itemset), key = lambda x: order.index(x.split(',')[0]))[-1]
+        class_label = ordered_itemset(itemset, order)[-1]
 
         # if class_label not in ['class,tested_negative', 'class,tested_positive']:
         #     raise Exception("Different class label: ", class_label)
@@ -74,26 +78,10 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     frequent_itemsets = list()
     # Stores the list of support counts of frequent itemsets
     support = list()
-    # A set that is used to track whether an itemset has already been added to frequent_itemsets
-    added = set()
+
+    itemsets_per_class = int(n_itemsets/len(support_counts_for_items))
     for (key, value) in support_counts_for_items.items():
-    # heapq implements min-heap by default but we want a max-heap. In order to simulate that behaviour, we multiply the support counts with -1. The most negative value will be the minimum and will be at the top of the heap.
-        counts = [-item[1] for item in value]
-
-        # heapify the counts list
-        heapq.heapify(counts)
-        num_itemsets_added = 0
-        while num_itemsets_added < n_itemsets/len(support_counts_for_items) and len(counts) != 0:
-            count = heapq.heappop(counts)
-            # Iterate through all the itemsets
-            for item, supp in value:
-                # If support of current itemset is equal to count and it has not been added to frequent_itemsets
-                if supp == -count and item not in added:
-                    frequent_itemsets_with_support.append([item, supp])
-                    added.add(item)
-                    
-            num_itemsets_added += 1
-
+        frequent_itemsets_with_support += sorted(list(value), key=lambda x: x[1], reverse=True)[:itemsets_per_class]
     # Sort the itemsets in the correct order ot allow joining of itemsets
     frequent_itemsets_with_support.sort(key=lambda x: tuple(order.index(d.split(',')[0]) for d in x[0]))
     # First item of each entry is an itemset
@@ -102,7 +90,8 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     support = [entry[1] for entry in frequent_itemsets_with_support]
     return frequent_itemsets, support
 
-def get_confident_rules(frequent_itemsets, n_rules, transactions, class_label):
+def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
+    class_label = order[-1]
     rules = []
     num_trans = len(transactions)
     for j in range(len(frequent_itemsets)):
@@ -118,7 +107,11 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, class_label):
                 sup_x_s = count_occurences(X_S, transactions)
                 conf = calculate_confidence(S, X, transactions)
                 lift = sup_x/(sup_x_s/num_trans)
-                curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
+                curr_rules.append(Rule(
+                                ordered_itemset(X, order), 
+                                ordered_itemset(S, order), 
+                                ordered_itemset(X_S, order), 
+                                sup_x, conf, lift))
         rules += curr_rules
     rules.sort(key=lambda x: x.conf, reverse=True)
     # print("Intermediate rules:")

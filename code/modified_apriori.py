@@ -31,7 +31,7 @@ candidates.update({itemset_size: items})
 def print_table(T, supp_count):
     print('Itemset | Frequency')
     for k in range(len(T)):
-        print(f'{list(T[k])} : {supp_count[k]}')
+        print(f'{ordered_itemset(T[k], order)} : {supp_count[k]}')
     print()
     print()
 
@@ -43,15 +43,17 @@ supp_count_L.update({itemset_size: support})
 k = itemset_size + 1
 convergence = False
 while convergence == False:
-    candidates.update({k: join_set_itemsets(frequent_itemsets[k - 1], order)})
-    candidates[k] += candidates[k - 1]
-    print(f'Table C{k}: \n')
-    print(len(candidates[k]))
-    print_table(candidates[k], [count_occurences(it, transactions) for it in candidates[k]])
-    frequent, support = get_frequent(candidates[k], transactions, n_itemsets, order)
-    frequent_itemsets.update({k: frequent})
-    supp_count_L.update({k: support})
-    if len(frequent_itemsets[k]) == 0:
+    candidates.update({k: join_set_itemsets(frequent_itemsets[k - 1], k, order)})
+    if len(candidates[k]) > 0:
+        candidates[k] += candidates[k - 1]
+        print(f'Table C{k}: \n')
+        print(len(candidates[k]))
+        print_table(candidates[k], [count_occurences(it, transactions) for it in candidates[k]])
+        frequent, support = get_frequent(candidates[k], transactions, n_itemsets, order)
+        frequent_itemsets.update({k: frequent})
+        supp_count_L.update({k: support})
+    # Stop proceeding further if no candidates of size k are generated
+    if len(candidates[k]) == 0:
         convergence = True
     else:
         print(f'Table L{k}: \n')
@@ -76,7 +78,7 @@ def write_rules(rule: Rule):
 assoc_rules_str = ''
 rules_list = []
 num_trans = len(transactions)
-confident_rules = get_confident_rules(frequent_itemsets[k - 1], n_rules, transactions, order[-1])
+confident_rules = get_confident_rules(frequent_itemsets[k - 1], n_rules, transactions, order)
 for rule in confident_rules:
     rules_list.append([list(rule.left), list(rule.right)])
     assoc_rules_str += write_rules(rule)
