@@ -39,7 +39,6 @@ def join_two_itemsets(it1: frozenset, it2: frozenset, order):
 
 def join_set_itemsets(itemsets, k, order):
     C = []
-    itemsetsAdded = set()
     itemsetsToBeJoined = []
     for itemset in itemsets:
         if len(itemset) == k:
