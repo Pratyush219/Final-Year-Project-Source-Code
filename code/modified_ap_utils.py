@@ -83,7 +83,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
         # A set that is used to track whether an itemset has already been added to frequent_itemsets
         added = set()
         num_itemsets_added = 0
-        while num_itemsets_added < n_itemsets and len(counts) != 0:
+        while num_itemsets_added < n_itemsets/len(support_counts_for_items) and len(counts) != 0:
             count = heapq.heappop(counts)
             # Iterate through all the itemsets
             for item, supp in value:
