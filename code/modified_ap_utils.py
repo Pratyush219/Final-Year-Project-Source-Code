@@ -57,7 +57,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     #support_counts_for_items = []
     support_counts_for_items = {}
     for itemset in itemsets:
-        class_label = str(list(itemset)[-1])
+        class_label = sorted(list(itemset), key = lambda x: order.index(x.split(',')[0]))[-1]
 
         # if class_label not in ['class,tested_negative', 'class,tested_positive']:
         #     raise Exception("Different class label: ", class_label)
@@ -67,21 +67,21 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
             support_counts_for_items[class_label]=[]
         if support > 0:
             support_counts_for_items[class_label].append((itemset, support))
-    
+    print("Number of class labels: ", len(support_counts_for_items))
+    # Stores the list of frequent itemsets along with their support
+    frequent_itemsets_with_support = list() 
+    # Stores the list of frequent itemsets
+    frequent_itemsets = list()
+    # Stores the list of support counts of frequent itemsets
+    support = list()
+    # A set that is used to track whether an itemset has already been added to frequent_itemsets
+    added = set()
     for (key, value) in support_counts_for_items.items():
     # heapq implements min-heap by default but we want a max-heap. In order to simulate that behaviour, we multiply the support counts with -1. The most negative value will be the minimum and will be at the top of the heap.
         counts = [-item[1] for item in value]
 
         # heapify the counts list
         heapq.heapify(counts)
-        # Stores the list of frequent itemsets along with their support
-        frequent_itemsets_with_support = list() 
-        # Stores the list of frequent itemsets
-        frequent_itemsets = list()
-        # Stores the list of support counts of frequent itemsets
-        support = list()
-        # A set that is used to track whether an itemset has already been added to frequent_itemsets
-        added = set()
         num_itemsets_added = 0
         while num_itemsets_added < n_itemsets/len(support_counts_for_items) and len(counts) != 0:
             count = heapq.heappop(counts)
@@ -91,6 +91,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
                 if supp == -count and item not in added:
                     frequent_itemsets_with_support.append([item, supp])
                     added.add(item)
+                    
             num_itemsets_added += 1
 
     # Sort the itemsets in the correct order ot allow joining of itemsets
