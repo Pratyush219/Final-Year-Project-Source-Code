@@ -68,6 +68,7 @@ def write_rules(rule: Rule):
     out_rules += f'Freq. Itemset: {rule.itemset}\n'
     out_rules += f'\tRule: {rule.left} -> {rule.right}\n'
     out_rules += f'\tConf: {rule.conf:2.3f} '
+    out_rules += f'\trConf: {rule.rconf:2.3f}\n'
     out_rules += f'\tSupp: {(rule.supp/num_trans):2.3f} '
     out_rules += f'\tLift: {rule.lift:2.3f}\n'
     return out_rules

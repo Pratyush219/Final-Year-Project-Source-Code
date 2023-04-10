@@ -4,13 +4,19 @@ from itertools import combinations, chain
 
 support_counts = dict()
 class Rule:
-    def __init__(self, itemset: set, left: set, right: set, supp, conf, lift) -> None:
+    def __init__(self, itemset: set, left: set, right: set, supp, conf, lift, rconf) -> None:
         self.itemset = list(itemset)
         self.left = list(left)
         self.right = list(right)
         self.conf = conf
         self.supp = supp
         self.lift = lift
+        self.rconf = rconf
+        
+        # print('-------------------------------------------')
+        # print(self.left,"->",self.right)
+        # print("rconf: ",rconf," conf: ",conf)    
+        # print('-------------------------------------------')    
 
     
 def powerset(s):
@@ -52,6 +58,14 @@ def calculate_confidence(left, itemset, transactions):
     supp_itemset = count_occurences(itemset, transactions)
     supp_left = count_occurences(left, transactions)
     return supp_itemset/supp_left
+
+def calculate_rel_confidence(left, right,  itemset, transactions):
+    supp_itemset = count_occurences(itemset, transactions)
+    supp_left = count_occurences(left, transactions)
+    supp_right = count_occurences(right, transactions)
+    rconf = (supp_itemset/(supp_left-supp_itemset))*((len(transactions)-supp_right)/supp_right)
+    return rconf
+
 def get_frequent(itemsets, transactions, n_itemsets, order):
     # Store the support counts of all the itemsets
     support_counts_for_items = []
@@ -106,10 +120,11 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, class_label):
                 sup_x = count_occurences(X, transactions)
                 sup_x_s = count_occurences(X_S, transactions)
                 conf = calculate_confidence(S, X, transactions)
+                rconf = calculate_rel_confidence(S, X_S, X, transactions)
                 lift = sup_x/(sup_x_s/num_trans)
-                curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift))
+                curr_rules.append(Rule(X, S, X_S, sup_x, conf, lift, rconf))
         rules += curr_rules
-    rules.sort(key=lambda x: x.conf, reverse=True)
+    rules.sort(key=lambda x: x.rconf, reverse=True)
     # print("Intermediate rules:")
     # print(rules)
     return rules[:n_rules]
