@@ -121,11 +121,13 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
                 conf = calculate_confidence(S, X, transactions)
                 rconf = calculate_rel_confidence(S, X_S, X, transactions)
                 lift = sup_x/(sup_x_s/num_trans)
-                curr_rules.append(Rule(
+                temp_rule = Rule(
                                 ordered_itemset(X, order), 
                                 ordered_itemset(S, order), 
                                 ordered_itemset(X_S, order), 
-                                sup_x, conf, lift, rconf))
+                                sup_x, conf, lift, rconf)
+                if reduce_redundancy(temp_rule,transactions):
+                    curr_rules.append(temp_rule)
         rules += curr_rules
     rules.sort(key=lambda x: x.rconf, reverse=True)
     # print("Intermediate rules:")
@@ -138,4 +140,22 @@ def generate_features(rules, columns):
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == columns[-1]:
             features.append(rule[0])
+    print(len(features))
     return (features)
+
+def reduce_redundancy(rule, transactions):
+    left = frozenset(rule.left)
+    right = frozenset(rule.right) 
+    itemset = frozenset(rule.itemset)
+    rel_conf_itemset = calculate_rel_confidence(left,right,itemset,transactions)
+    verdict = False
+    if(len(rule.left) > 1):
+        flag = True
+        for i in left:
+            i = frozenset(list(i))
+            flag &= (calculate_rel_confidence(i,right,itemset,transactions) <= rel_conf_itemset)
+        if flag:
+            verdict = True
+    else:
+        verdict = True
+    return verdict

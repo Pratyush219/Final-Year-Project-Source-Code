@@ -2,9 +2,9 @@ from modified_ap_utils import *
 import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
-path_to_data = '../data/diabetes1.csv'
-n_itemsets = 30
-n_rules = 15
+path_to_data = '../data/heart_2020_cleaned.csv'
+n_itemsets = 150
+n_rules = 150
 
 data = load_data(path_to_data)
 print('Data loaded')
@@ -63,6 +63,8 @@ while convergence == False:
         if k == len(transactions[0]) - 1:
             convergence = True
 
+print("Candidates: ")
+print(candidates)
 print("Final itemsets:")
 pprint.pprint(frequent_itemsets[k - 1])
 def write_rules(rule: Rule):
@@ -80,6 +82,7 @@ assoc_rules_str = ''
 rules_list = []
 num_trans = len(transactions)
 confident_rules = get_confident_rules(frequent_itemsets[k - 1], n_rules, transactions, order)
+
 for rule in confident_rules:
     rules_list.append([list(rule.left), list(rule.right)])
     assoc_rules_str += write_rules(rule)
