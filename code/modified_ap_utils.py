@@ -66,6 +66,8 @@ def calculate_rel_confidence(left, right,  itemset, transactions):
     supp_itemset = count_occurences(itemset, transactions)
     supp_left = count_occurences(left, transactions)
     supp_right = count_occurences(right, transactions)
+    if supp_left - supp_itemset == 0:
+        return float('inf')
     rconf = (supp_itemset/(supp_left-supp_itemset))*((len(transactions)-supp_right)/supp_right)
     return rconf
 
@@ -84,7 +86,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
             support_counts_for_items[class_label]=[]
         if support > 0:
             support_counts_for_items[class_label].append((itemset, support))
-    print("Number of class labels: ", len(support_counts_for_items))
+    # print("Number of class labels: ", len(support_counts_for_items))
     # Stores the list of frequent itemsets along with their support
     frequent_itemsets_with_support = list() 
     # Stores the list of frequent itemsets
@@ -140,7 +142,7 @@ def generate_features(rules, columns):
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == columns[-1]:
             features.append(rule[0])
-    print(len(features))
+    # print(len(features))
     return (features)
 
 def reduce_redundancy(rule, transactions):
