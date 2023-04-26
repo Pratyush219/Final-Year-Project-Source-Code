@@ -33,8 +33,9 @@ def discretize_data(data: pd.DataFrame, k: int):
     for col in transformed_data.columns[:-1]:
         # Sort the values in current column
         sorted_data = [val for val in transformed_data[col]]
-        if is_numeric_dtype(transformed_data[col]):
-            sorted_data = sorted([float(val) for val in transformed_data[col]])
+        if not is_numeric_dtype(transformed_data[col]):
+            continue
+        sorted_data = sorted([float(val) for val in transformed_data[col]])
         max_val = max(sorted_data)
         split_points = []
         # Use a set to ensure that one split point gets added to the split_points
