@@ -136,14 +136,58 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
     # print(rules)
     return rules[:n_rules]
 
+
 def generate_features(rules, columns):
+    conf_rules_right = {}
+    final_features = {}
     features = []
+    features_dict = {}
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
-        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == columns[-1]:
-            features.append(rule[0])
+        cell = ordered_itemset(rule.right, columns)[-1].split(',')
+        if len(rule.right) == 1 and cell[0] == columns[-1]:
+            # features.append(rule[0])
+            label = cell[1]
+            if label not in features_dict:
+                features_dict[label] = set()
+                conf_rules_right[label] = []
+            features_dict[label].add(tuple(rule.left))
+            conf_rules_right[label].append([rule.left,rule.rconf])
     # print(len(features))
-    return (features)
+    # print('-------------conf_rules_right---------------')
+    # for key in conf_rules_right:
+    #     print(conf_rules_right[key])
+    #     print('\n')
+    # print(conf_rules_right)
+
+    for key in conf_rules_right:
+        final_features[key] = set()
+        for items in conf_rules_right[key]:
+            # print('=======ITEMS=======',items)
+            left = items[0]
+            rconf = items[1]
+            for check_items in conf_rules_right[key]:
+                # print('=======CHECK_ITEMS=======',check_items)
+                check_items_left = check_items[0]
+                check_items_rconf = check_items[1]
+                if left[0] in check_items_left:
+                    if rconf > check_items_rconf:
+                        # final_features[key].add(tuple(left))
+                        continue
+                    elif rconf < check_items_rconf:
+                        # final_features[key].add(tuple(check_items_left))
+                        left = check_items_left
+                        rconf = check_items_rconf
+            final_features[key].add(tuple(left))
+    # print('=======FINAL FEATURES============')
+    # for key in final_features:
+    #     print('\n')
+    #     print(key,':\n')
+    #     for items in final_features[key]:
+    #         print(items)
+    #         # print('\n')
+
+    return (final_features)
 
 def reduce_redundancy(rule, transactions):
     left = frozenset(rule.left)

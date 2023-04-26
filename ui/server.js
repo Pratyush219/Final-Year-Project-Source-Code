@@ -29,11 +29,10 @@ app.get('/results/:file', (req, res) => {
     let fileName = req.params['file']
     let options = {args: [fileName]}
     console.log('Running');
-    pythonShell.PythonShell.run('../code/modified_apriori.py', options, (err, results) => {
-        if(err) {
-            console.log(err);
-        }
-        console.log(results);
+    pythonShell.PythonShell.run(__dirname + '/../code/modified_apriori.py', options).then(messages => {
+        console.log(messages);
+        // let result = JSON.parse(messages[0])
+        res.send(messages[0])
     })
 })
 app.listen(port, () => {
