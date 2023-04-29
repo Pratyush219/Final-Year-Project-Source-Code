@@ -102,9 +102,14 @@ def get_confident_rules(itemsets, supp_count):
     
     pass
 def generate_features(rules, order):
+    features_dict = {}
     features = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
-        if len(rule[1]) == 1 and rule[1].pop().split(',')[0] == 'Outcome':
+        if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
+            label = list(rule[1])[0].split(',')[1]
+            if label not in features_dict:
+                features_dict[label] = []
+            features_dict[label] += rule[0]
             features.append(rule[0])
-    return (features)
+    return features_dict
