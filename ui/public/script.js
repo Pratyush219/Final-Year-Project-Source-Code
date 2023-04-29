@@ -16,12 +16,13 @@ window.onload = () => {
                 files.split(',').forEach(file => {
                     if(file.split('.')[1] == "csv") {
                         const datasets = document.getElementsByClassName('datasets')[0]
-                        const button = document.createElement('button')
+                        const button = document.createElement('a')
                         button.className = 'dataset'
                         button.id = file
                         button.innerText = file
+                        button.style.margin = "0"
+                        button.style.textOverflow = "ellipsis"
                         datasets.appendChild(button)
-                        datasets.appendChild(document.createElement('br'))
                         button.addEventListener('click', () => {
                             let tbl = document.getElementById("features")
                             tbl.innerHTML = ''
@@ -35,9 +36,7 @@ window.onload = () => {
                                         for (const [k, v] of Object.entries(featuresDict)) {
                                             addSingleCellRow(tbl, k, "feature", "th")
                                             v.forEach(feature => {
-                                                text = ''
-                                                feature.forEach(main_feature => text += `(${main_feature}) `)
-                                                addSingleCellRow(tbl, text, "feature", "td")
+                                                addSingleCellRow(tbl, feature, "feature", "td")
                                             })
                                         }
                                         // featuresArray.forEach(feature => {

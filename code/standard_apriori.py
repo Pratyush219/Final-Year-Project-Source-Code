@@ -5,6 +5,16 @@ import pprint
 from load_and_preprocess_data import load_data, get_label_appended_data, discretize_data
 
 from itertools import combinations, chain
+
+class Rule:
+    def __init__(self, itemset: set, left: set, right: set, supp, conf, lift):
+        self.itemset = list(itemset)
+        self.left = list(left)
+        self.right = list(right)
+        self.conf = conf
+        self.supp = supp
+        self.lift = lift
+
 def powerset(s):
     return list(chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1)))
 
@@ -24,9 +34,9 @@ def print_table(T, supp_count):
     print()
     print()
 def standard_apriori_features(filename):
-    path_to_data = '../data/' + filename
-    min_support = 0.01
-    min_confidence = 0.01
+    path_to_data =  filename
+    min_support = 0.3
+    min_confidence = 0.2
 
     data = load_data(path_to_data)
     order = [col for col in data.columns]
@@ -116,15 +126,17 @@ def standard_apriori_features(filename):
                         rule_output, rule = write_rules(X, X_S, S, conf, sup_x, lift, num_trans)
                         # print(rule_output)
                         assoc_rules_str += rule_output
-                        rules_list.append(rule)
+                        # rules_list.append(Rule())
+                        rules_list.append(Rule(X, S, X_S, sup_x, conf, lift))
 
     # print(assoc_rules_str)
     # print(len(assoc_rules_str.split('\n')))
 
-    for rule in rules_list:
-        if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
-            # print(rule)
-            pass
 
     # print('Features:')
-    return generate_features(rules_list, order)
+    features, lifts = generate_features(rules_list, order)
+    print(features)
+    print(lifts)
+    return features, lifts
+
+# standard_apriori_features('../data/diabetes.csv')

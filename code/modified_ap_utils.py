@@ -208,6 +208,7 @@ final_features = {}
 def generate_features(rules, columns):
     features = []
     features_dict = {}
+    lifts = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         cell = ordered_itemset(rule.right, columns)[-1].split(',')
@@ -219,6 +220,7 @@ def generate_features(rules, columns):
                 conf_rules_right[label] = []
             features_dict[label].add(tuple(rule.left))
             conf_rules_right[label].append([rule.left,rule.rconf])
+            lifts.append(rule.lift)
 
     for key in conf_rules_right:
         final_features[key] = set()
@@ -246,7 +248,7 @@ def generate_features(rules, columns):
     #     for items in final_features[key]:
     #         print(items)
     #         # print('\n')
-    return (features_dict ,final_features)
+    return (features_dict ,final_features, lifts)
 
 def reduce_redundancy(rule, transactions):
     left = frozenset(rule.left)

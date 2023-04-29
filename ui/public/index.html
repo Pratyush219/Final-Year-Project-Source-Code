@@ -1,30 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
-</head>
-
-<body>
-    <div id="caption">
-        <h2>Choose a dataset to get features</h2>
-    </div>
-    <div class="fragments">
-        <div class="datasets fragment">
+<html>
+  <head>
+    <title>My Website</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Final Year Project by 19P23</div>
+      <div class="navbar-title">Discovery of Interesting Patterns using Association Rule Mining.</div>
+      <div class="navbar-dropdown">
+        <button class="navbar-dropdown-button">Choose a file 
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="navbar-dropdown-content datasets">
 
         </div>
-        <div class="results fragment">
-            <table id="features">
-
-            </table>
-        </div>
+      </div>
     </div>
 
-    <script src="./script.js"></script>
-</body>
+    <div class="split-container">
+      <div class="left">
+        <div class="centered">
+          <h2>Left Section</h2>
+          <p>This is the left section of the page.</p>
+            <div class="results fragment">
+              <table id="features">
 
+              </table>
+            </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="centered">
+          <h2>Right Section</h2>
+          <p>This is the right section of the page.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./script.js"></script>
 </html>

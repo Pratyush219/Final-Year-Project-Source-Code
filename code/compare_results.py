@@ -5,11 +5,11 @@ import time
 
 filename = 'diabetes.csv'
 start_time = time.time()
-result1 = standard_apriori_features(filename)
+result1, lifts1 = standard_apriori_features(filename)
 end_time1 = time.time()
 # print(result1)
 start_time2 = time.time()
-result2 = modified_apriori_features(filename)
+result2, lifts2 = modified_apriori_features(filename)
 end_time2 = time.time()
 # print(result2)
 
