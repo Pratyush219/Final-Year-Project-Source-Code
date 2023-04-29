@@ -3,5 +3,8 @@
     "fs": "^0.0.1-security",
     "json": "^11.0.0",
     "python-shell": "^5.0.0"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
   }
 }
