@@ -51,7 +51,6 @@ plt.bar(x_values2, count_length_reduced, color='green')
 plt.xlabel('Linear Spacing')
 plt.ylabel('Number of features')
 plt.title('Dataset length is 700')
-plt.savefig('features.jpg')
 
 # Add text labels to the bars
 for i in range(len(x_values1)):
@@ -60,5 +59,6 @@ for i in range(len(x_values1)):
 for i in range(len(x_values2)):
     plt.text(x=x_values2[i], y=count_length_reduced[i], s=class_label[i], ha='center', va='bottom')
 
+plt.savefig('features.jpg')
 # plt.savefig('my_plot.png')
 # plt.show()

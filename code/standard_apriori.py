@@ -25,7 +25,7 @@ def print_table(T, supp_count):
     print()
 def standard_apriori_features(filename):
     path_to_data = '../data/' + filename
-    min_support = 0.01
+    min_support = 0.02
     min_confidence = 0.01
 
     data = load_data(path_to_data)
