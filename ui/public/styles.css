@@ -1,0 +1,21 @@
+.fragments {
+    display: flex;
+}
+.fragment {
+    border: 1px solid black;
+    width: 100%;
+}
+.dataset {
+    margin: 0.3em;
+}
+
+.datasets {
+    background-color: aliceblue;
+}
+
+table, th, tr, td {
+    border-collapse: collapse;
+}
+.feature {
+    border: 2px solid black;
+}

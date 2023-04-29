@@ -35,7 +35,9 @@ window.onload = () => {
                                         for (const [k, v] of Object.entries(featuresDict)) {
                                             addSingleCellRow(tbl, k, "feature", "th")
                                             v.forEach(feature => {
-                                                addSingleCellRow(tbl, feature, "feature", "td")
+                                                text = ''
+                                                feature.forEach(main_feature => text += `(${main_feature}) `)
+                                                addSingleCellRow(tbl, text, "feature", "td")
                                             })
                                         }
                                         // featuresArray.forEach(feature => {
