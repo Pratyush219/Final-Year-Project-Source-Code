@@ -111,16 +111,15 @@ def get_confident_rules(itemsets, supp_count):
     #TODO: Generate confident rules based on the algorithm in the base paper
     
     pass
-def generate_features(rules, order):
+def generate_features(rules, order, class_labels):
     features_dict = {}
-    features = []
+    for class_label in class_labels:
+        features_dict[str(class_label)] = []
     lifts = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         if len(rule.right) == 1 and rule.right[0].split(',')[0] == order[-1]:
             label = rule.right[0].split(',')[1]
-            if label not in features_dict:
-                features_dict[label] = []
             features_dict[label] += rule.left
             lifts.append(rule.lift)
             # features.append(rule[0])

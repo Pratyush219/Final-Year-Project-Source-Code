@@ -13,6 +13,9 @@ result2, lifts2 = modified_apriori_features(filename)
 end_time2 = time.time()
 # print(result2)
 
+print('Result1: ', result1)
+print('Result2: ', result2)
+
 # calculate the runtime of each function
 runtime1 = end_time1 - start_time
 runtime2 = end_time2 - start_time2

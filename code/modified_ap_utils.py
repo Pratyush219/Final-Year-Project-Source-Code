@@ -71,7 +71,73 @@ def calculate_rel_confidence(left, right,  itemset, transactions):
     rconf = (supp_itemset/(supp_left-supp_itemset))*((len(transactions)-supp_right)/supp_right)
     return rconf
 
-def get_frequent(itemsets, transactions, n_itemsets, order):
+# def get_frequent(itemsets, transactions, n_itemsets, order):
+#     # Store the support counts of all the itemsets
+#     #support_counts_for_items = []
+#     support_counts_for_items = {}
+#     for itemset in itemsets:
+#         class_label = ordered_itemset(itemset, order)[-1]
+
+#         # if class_label not in ['class,tested_negative', 'class,tested_positive']:
+#         #     raise Exception("Different class label: ", class_label)
+        
+#         support = count_occurences(itemset, transactions)
+#         if class_label not in support_counts_for_items.keys():
+#             support_counts_for_items[class_label]=[]
+#         if support > 0:
+#             support_counts_for_items[class_label].append((itemset, support))
+#     # print("Number of class labels: ", len(support_counts_for_items))
+#     # Stores the list of frequent itemsets along with their support
+#     frequent_itemsets_with_support = list() 
+#     # Stores the list of frequent itemsets
+#     frequent_itemsets = list()
+#     # Stores the list of support counts of frequent itemsets
+#     support = list()
+
+#     itemsets_per_class = int(n_itemsets/len(support_counts_for_items))
+#     for (key, value) in support_counts_for_items.items():
+#         frequent_itemsets_with_support += sorted(list(value), key=lambda x: x[1], reverse=True)[:itemsets_per_class]
+#     # Sort the itemsets in the correct order ot allow joining of itemsets
+#     frequent_itemsets_with_support.sort(key=lambda x: tuple(order.index(d.split(',')[0]) for d in x[0]))
+#     # First item of each entry is an itemset
+#     frequent_itemsets = [entry[0] for entry in frequent_itemsets_with_support]
+#     # Second item of each entry is support count
+#     support = [entry[1] for entry in frequent_itemsets_with_support]
+#     return frequent_itemsets, support
+
+# def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
+#     class_label = order[-1]
+#     rules = []
+#     num_trans = len(transactions)
+#     for j in range(len(frequent_itemsets)):
+#         s = list(powerset(frequent_itemsets[j]))
+#         s.pop()
+#         curr_rules = []
+#         for z in s:
+#             S = frozenset(z)
+#             X = frequent_itemsets[j]
+#             X_S = frozenset(X - S)
+#             if len(X_S) == 1 and list(X_S)[0].split(',')[0] == class_label:
+#                 sup_x = count_occurences(X, transactions)
+#                 sup_x_s = count_occurences(X_S, transactions)
+#                 conf = calculate_confidence(S, X, transactions)
+#                 rconf = calculate_rel_confidence(S, X_S, X, transactions)
+#                 lift = sup_x/(sup_x_s/num_trans)
+#                 temp_rule = Rule(
+#                                 ordered_itemset(X, order), 
+#                                 ordered_itemset(S, order), 
+#                                 ordered_itemset(X_S, order), 
+#                                 sup_x, conf, lift, rconf)
+#                 if reduce_redundancy(temp_rule,transactions):
+#                     curr_rules.append(temp_rule)
+#         rules += curr_rules
+#     rules.sort(key=lambda x: x.rconf, reverse=True)
+#     # print("Intermediate rules:")
+#     # print(rules)
+#     return rules[:n_rules]
+
+
+def get_frequent(itemsets, transactions, n_itemsets, order, class_labels):
     # Store the support counts of all the itemsets
     #support_counts_for_items = []
     support_counts_for_items = {}
@@ -94,73 +160,7 @@ def get_frequent(itemsets, transactions, n_itemsets, order):
     # Stores the list of support counts of frequent itemsets
     support = list()
 
-    itemsets_per_class = int(n_itemsets/len(support_counts_for_items))
-    for (key, value) in support_counts_for_items.items():
-        frequent_itemsets_with_support += sorted(list(value), key=lambda x: x[1], reverse=True)[:itemsets_per_class]
-    # Sort the itemsets in the correct order ot allow joining of itemsets
-    frequent_itemsets_with_support.sort(key=lambda x: tuple(order.index(d.split(',')[0]) for d in x[0]))
-    # First item of each entry is an itemset
-    frequent_itemsets = [entry[0] for entry in frequent_itemsets_with_support]
-    # Second item of each entry is support count
-    support = [entry[1] for entry in frequent_itemsets_with_support]
-    return frequent_itemsets, support
-
-def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
-    class_label = order[-1]
-    rules = []
-    num_trans = len(transactions)
-    for j in range(len(frequent_itemsets)):
-        s = list(powerset(frequent_itemsets[j]))
-        s.pop()
-        curr_rules = []
-        for z in s:
-            S = frozenset(z)
-            X = frequent_itemsets[j]
-            X_S = frozenset(X - S)
-            if len(X_S) == 1 and list(X_S)[0].split(',')[0] == class_label:
-                sup_x = count_occurences(X, transactions)
-                sup_x_s = count_occurences(X_S, transactions)
-                conf = calculate_confidence(S, X, transactions)
-                rconf = calculate_rel_confidence(S, X_S, X, transactions)
-                lift = sup_x/(sup_x_s/num_trans)
-                temp_rule = Rule(
-                                ordered_itemset(X, order), 
-                                ordered_itemset(S, order), 
-                                ordered_itemset(X_S, order), 
-                                sup_x, conf, lift, rconf)
-                if reduce_redundancy(temp_rule,transactions):
-                    curr_rules.append(temp_rule)
-        rules += curr_rules
-    rules.sort(key=lambda x: x.rconf, reverse=True)
-    # print("Intermediate rules:")
-    # print(rules)
-    return rules[:n_rules]
-
-
-def get_frequent(itemsets, transactions, n_itemsets, order):
-    # Store the support counts of all the itemsets
-    #support_counts_for_items = []
-    support_counts_for_items = {}
-    for itemset in itemsets:
-        class_label = ordered_itemset(itemset, order)[-1]
-
-        # if class_label not in ['class,tested_negative', 'class,tested_positive']:
-        #     raise Exception("Different class label: ", class_label)
-        
-        support = count_occurences(itemset, transactions)
-        if class_label not in support_counts_for_items.keys():
-            support_counts_for_items[class_label]=[]
-        if support > 0:
-            support_counts_for_items[class_label].append((itemset, support))
-    # print("Number of class labels: ", len(support_counts_for_items))
-    # Stores the list of frequent itemsets along with their support
-    frequent_itemsets_with_support = list() 
-    # Stores the list of frequent itemsets
-    frequent_itemsets = list()
-    # Stores the list of support counts of frequent itemsets
-    support = list()
-
-    itemsets_per_class = int(n_itemsets/len(support_counts_for_items))
+    itemsets_per_class = int(n_itemsets/len(class_labels))
     for (key, value) in support_counts_for_items.items():
         frequent_itemsets_with_support += sorted(list(value), key=lambda x: x[1], reverse=True)[:itemsets_per_class]
     # Sort the itemsets in the correct order ot allow joining of itemsets
@@ -205,10 +205,14 @@ def get_confident_rules(frequent_itemsets, n_rules, transactions, order):
 
 conf_rules_right = {}
 final_features = {}
-def generate_features(rules, columns):
-    features = []
+def generate_features(rules, columns, class_labels):
     features_dict = {}
     lifts = []
+    for class_label in class_labels:
+        features_dict[str(class_label)] = set()
+        conf_rules_right[str(class_label)] = []
+    print(features_dict)
+    print(conf_rules_right)
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         cell = ordered_itemset(rule.right, columns)[-1].split(',')
@@ -219,8 +223,8 @@ def generate_features(rules, columns):
                 features_dict[label] = set()
                 conf_rules_right[label] = []
             features_dict[label].add(tuple(rule.left))
-            conf_rules_right[label].append([rule.left,rule.rconf])
             lifts.append(rule.lift)
+            conf_rules_right[label].append([rule.left,rule.rconf])
 
     for key in conf_rules_right:
         final_features[key] = set()
@@ -241,13 +245,6 @@ def generate_features(rules, columns):
                         left = check_items_left
                         rconf = check_items_rconf
             final_features[key].add(tuple(left))
-    # print('=======FINAL FEATURES============')
-    # for key in final_features:
-    #     print('\n')
-    #     print(key,':\n')
-    #     for items in final_features[key]:
-    #         print(items)
-    #         # print('\n')
     return (features_dict ,final_features, lifts)
 
 def reduce_redundancy(rule, transactions):

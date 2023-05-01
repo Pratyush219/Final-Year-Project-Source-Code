@@ -34,13 +34,15 @@ def print_table(T, supp_count):
     print()
     print()
 def standard_apriori_features(filename):
-    path_to_data =  filename
+    path_to_data = '../data/' + filename
     min_support = 0.3
     min_confidence = 0.2
 
     data = load_data(path_to_data)
+    class_labels = set(data[data.columns[-1]])
     order = [col for col in data.columns]
     transformed_data = get_label_appended_data(data)
+    print(class_labels)
 
     transactions = transformed_data.to_numpy()
     # print(transactions)
@@ -134,9 +136,10 @@ def standard_apriori_features(filename):
 
 
     # print('Features:')
-    features, lifts = generate_features(rules_list, order)
-    print(features)
-    print(lifts)
+    features, lifts = generate_features(rules_list, order, class_labels)
+    # pprint.pprint(features)
+    # print(lifts)
     return features, lifts
 
 # standard_apriori_features('../data/diabetes.csv')
+# standard_apriori_features('diabetes.csv')
