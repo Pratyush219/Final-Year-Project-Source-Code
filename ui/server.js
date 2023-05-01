@@ -34,11 +34,11 @@ app.get('/results/:file', (req, res) => {
         // let result = JSON.parse(messages[0])
         res.send(messages[0])
     })
-    pythonShell.PythonShell.run(__dirname + '/../code/compare_results.py', options).then(messages => {
-        console.log(messages);
-        // let result = JSON.parse(messages[0])
-        res.send(messages[0])
-    })
+    // pythonShell.PythonShell.run(__dirname + '/../code/compare_results.py', options).then(messages => {
+    //     console.log(messages);
+    //     // let result = JSON.parse(messages[0])
+    //     res.send(messages[0])
+    // })
 });
 
 app.listen(port, () => {

@@ -24,21 +24,21 @@ window.onload = () => {
                         button.style.textOverflow = "ellipsis"
                         datasets.appendChild(button)
                         button.addEventListener('click', () => {
-                            let tbl = document.getElementById("features")
-                            tbl.innerHTML = ''
+                            // let tbl = document.getElementById("features")
+                            // tbl.innerHTML = ''
                             console.log("Click");
                             fetch('/results/' + file)
                                 .then(response => {
                                     response.text().then(features => {
                                         featuresDict = JSON.parse(features)
                                         console.log(featuresDict)
-                                        
-                                        for (const [k, v] of Object.entries(featuresDict)) {
-                                            addSingleCellRow(tbl, k, "feature", "th")
-                                            v.forEach(feature => {
-                                                addSingleCellRow(tbl, feature, "feature", "td")
-                                            })
-                                        }
+                                        test(featuresDict);
+                                        // for (const [k, v] of Object.entries(featuresDict)) {
+                                        //     addSingleCellRow(tbl, k, "feature", "th")
+                                        //     v.forEach(feature => {
+                                        //         addSingleCellRow(tbl, feature, "feature", "td")
+                                        //     })
+                                        // }
                                         // featuresArray.forEach(feature => {
                                         //     const row = document.createElement("tr")
                                         //     const cell = document.createElement("td")
@@ -55,4 +55,70 @@ window.onload = () => {
             })
 
         })
+}
+function test(tableData){
+    // Get the dropdowns container element
+    var dropdowns = document.querySelector(".dropdowns");
+    dropdowns.innerHTML = "";
+
+    // Loop through the tableData object and create a dropdown list for each key-value pair
+    for (var key in tableData) {
+        // Get the value array for the key
+        var value = tableData[key];
+
+        // Create a dropdown list with the key and the value
+        var dropdown = createDropdown(key, value);
+
+        // Append the dropdown list to the dropdowns container
+        dropdowns.appendChild(dropdown);
+    }
+}
+function createDropdown(id, data) {
+    // Create a div element for the dropdown
+    var dropdown = document.createElement("div");
+    dropdown.className = "dropdown";
+    dropdown.id = id;
+
+    // Create a button element for the dropdown
+    var button = document.createElement("button");
+    button.innerHTML = 'Class Label: '+ id;
+    button.onclick = function() {
+        // Toggle the show class on the dropdown element
+        dropdown.classList.toggle("show");
+    };
+
+    // Create a div element for the dropdown content
+    var content = document.createElement("div");
+    content.className = "dropdown-content";
+
+    // Create a table element for the table data
+    var table = document.createElement("table");
+
+    // Loop through the data array and create a table row for each item
+    for (var i = 0; i < data.length; i++) {
+        // Create a table row element
+        var row = document.createElement("tr");
+
+        // Create a table cell element
+        var cell = document.createElement("td");
+
+        // Set the cell text to the data item
+        cell.innerHTML = data[i];
+
+        // Append the cell to the row
+        row.appendChild(cell);
+
+        // Append the row to the table
+        table.appendChild(row);
+    }
+
+    // Append the table to the content
+    content.appendChild(table);
+
+    // Append the button and the content to the dropdown
+    dropdown.appendChild(button);
+    dropdown.appendChild(content);
+
+    // Return the dropdown element
+    return dropdown;
 }
