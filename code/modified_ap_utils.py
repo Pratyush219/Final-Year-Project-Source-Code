@@ -207,6 +207,7 @@ conf_rules_right = {}
 final_features = {}
 def generate_features(rules, columns, class_labels):
     features_dict = {}
+    lifts = []
     for class_label in class_labels:
         features_dict[str(class_label)] = set()
         conf_rules_right[str(class_label)] = []
@@ -222,6 +223,7 @@ def generate_features(rules, columns, class_labels):
                 features_dict[label] = set()
                 conf_rules_right[label] = []
             features_dict[label].add(tuple(rule.left))
+            lifts.append(rule.lift)
             conf_rules_right[label].append([rule.left,rule.rconf])
 
     for key in conf_rules_right:
@@ -243,7 +245,7 @@ def generate_features(rules, columns, class_labels):
                         left = check_items_left
                         rconf = check_items_rconf
             final_features[key].add(tuple(left))
-    return (features_dict ,final_features)
+    return (features_dict ,final_features, lifts)
 
 def reduce_redundancy(rule, transactions):
     left = frozenset(rule.left)

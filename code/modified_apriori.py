@@ -87,7 +87,7 @@ def modified_apriori_features(filename):
 
     # print(assoc_rules_str)
 
-    (features_dict, final_features) = generate_features(confident_rules, order, class_labels)
+    (features_dict, final_features, lifts) = generate_features(confident_rules, order, class_labels)
 
     input_string = str(final_features)
 
@@ -103,7 +103,7 @@ def modified_apriori_features(filename):
 
     # Print the JSON object as a string
     pprint.pprint(json_object)
-    return final_features
+    return final_features, lifts
 
 if __name__ == '__main__':
     modified_apriori_features(sys.argv[1])
