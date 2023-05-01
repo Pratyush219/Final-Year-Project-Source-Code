@@ -1,5 +1,15 @@
 import numpy as np
 import heapq
+
+class Rule:
+    def _init_(self, itemset: set, left: set, right: set, supp, conf, lift, rconf) -> None:
+        self.itemset = list(itemset)
+        self.left = list(left)
+        self.right = list(right)
+        self.conf = conf
+        self.supp = supp
+        self.lift = lift
+        self.rconf = rconf
 def load_transactions(path_to_data, order):
     transactions = []
     with open(path_to_data, 'r') as fid:
@@ -101,15 +111,16 @@ def get_confident_rules(itemsets, supp_count):
     #TODO: Generate confident rules based on the algorithm in the base paper
     
     pass
-def generate_features(rules, order):
+def generate_features(rules, order, class_labels):
     features_dict = {}
-    features = []
+    for class_label in class_labels:
+        features_dict[str(class_label)] = []
+    lifts = []
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
-        if len(rule[1]) == 1 and list(rule[1])[0].split(',')[0] == order[-1]:
-            label = list(rule[1])[0].split(',')[1]
-            if label not in features_dict:
-                features_dict[label] = []
-            features_dict[label] += rule[0]
-            features.append(rule[0])
-    return features_dict
+        if len(rule.right) == 1 and rule.right[0].split(',')[0] == order[-1]:
+            label = rule.right[0].split(',')[1]
+            features_dict[label] += rule.left
+            lifts.append(rule.lift)
+            # features.append(rule[0])
+    return features_dict, lifts
