@@ -142,4 +142,4 @@ def standard_apriori_features(filename):
     return features, lifts
 
 # standard_apriori_features('../data/diabetes.csv')
-standard_apriori_features('diabetes.csv')
+# standard_apriori_features('diabetes.csv')
