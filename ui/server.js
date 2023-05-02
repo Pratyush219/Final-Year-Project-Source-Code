@@ -32,7 +32,8 @@ app.get('/results/:file', (req, res) => {
     pythonShell.PythonShell.run(__dirname + '/../code/modified_apriori.py', options).then(messages => {
         console.log(messages);
         // let result = JSON.parse(messages[0])
-        res.send(messages[0])
+        // console.log(result);
+        res.send(messages[0]);
     })
     // pythonShell.PythonShell.run(__dirname + '/../code/compare_results.py', options).then(messages => {
     //     console.log(messages);
@@ -40,6 +41,15 @@ app.get('/results/:file', (req, res) => {
     //     res.send(messages[0])
     // })
 });
+
+app.get('/compare_results/:file', (req,res)=>{
+    let fileName = req.params['file']
+    let options = {args: [fileName]}
+    console.log('Plotting....')
+    pythonShell.PythonShell.run(__dirname + '/../code/compare_results.py', options).then(messages =>{
+        res.send('Success!');
+    })
+})
 
 app.listen(port, () => {
     console.log(`Server listening on port ${ port }`);

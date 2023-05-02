@@ -1,6 +1,10 @@
 window.onload = () => {
     console.log("Loaded");
 
+    const uploadFileBtn = document.getElementById('chooseFile')
+    const leftDropDown = document.querySelector(".dropdowns")
+    const rightDropDown = document.querySelector(".dropdowns_right")
+
     addSingleCellRow = (parentTable, text, klassName, element) => {
         const row = document.createElement("tr")
         const cell = document.createElement(element)
@@ -26,13 +30,17 @@ window.onload = () => {
                         button.addEventListener('click', () => {
                             // let tbl = document.getElementById("features")
                             // tbl.innerHTML = ''
-                            console.log("Click");
+                            console.log("Click")
+                            uploadFileBtn.textContent = "Current File: "+file+"    Hover to change to another file.";
+                            leftDropDown.innerHTML = ""
+                            rightDropDown.innerHTML = ""
                             fetch('/results/' + file)
                                 .then(response => {
                                     response.text().then(features => {
+                                        //console.log(features);
                                         featuresDict = JSON.parse(features)
                                         console.log(featuresDict)
-                                        test(featuresDict);
+                                        display_features(featuresDict);
                                         // for (const [k, v] of Object.entries(featuresDict)) {
                                         //     addSingleCellRow(tbl, k, "feature", "th")
                                         //     v.forEach(feature => {
@@ -49,6 +57,15 @@ window.onload = () => {
                                         // })
                                     })
                                 })
+                            fetch('/compare_results/'+file)
+                            .then(response => {
+                                var graphs = {
+                                    "Features: Unreduced v/s Reduced": "features.jpg",
+                                    "Features: Standard Apriori": "standard.png",
+                                    "Runtime": "runtime.jpg"
+                                }
+                                show_graphs(graphs)
+                            })
                         })
                     }
                 });
@@ -56,7 +73,9 @@ window.onload = () => {
 
         })
 }
-function test(tableData){
+
+function display_features(tableData){
+    console.log("DISPLAY FEATURES CALLED!");
     // Get the dropdowns container element
     var dropdowns = document.querySelector(".dropdowns");
     dropdowns.innerHTML = "";
@@ -67,13 +86,14 @@ function test(tableData){
         var value = tableData[key];
 
         // Create a dropdown list with the key and the value
-        var dropdown = createDropdown(key, value);
+        var dropdown = createDropdownLeft(key, value);
 
         // Append the dropdown list to the dropdowns container
         dropdowns.appendChild(dropdown);
     }
 }
-function createDropdown(id, data) {
+
+function createDropdownLeft(id, data) {
     // Create a div element for the dropdown
     var dropdown = document.createElement("div");
     dropdown.className = "dropdown";
@@ -114,6 +134,56 @@ function createDropdown(id, data) {
 
     // Append the table to the content
     content.appendChild(table);
+
+    // Append the button and the content to the dropdown
+    dropdown.appendChild(button);
+    dropdown.appendChild(content);
+
+    // Return the dropdown element
+    return dropdown;
+}
+
+function show_graphs(graphs){
+    var dropdowns = document.querySelector(".dropdowns_right")
+    dropdowns.innerHTML = ""
+    for (var key in graphs) {
+        // Get the value array for the key
+        var value = graphs[key];
+
+        // Create a dropdown list with the key and the value
+        var dropdown = createDropdownRight(key, value);
+
+        // Append the dropdown list to the dropdowns container
+        dropdowns.appendChild(dropdown);
+    }
+}
+
+function createDropdownRight(id, data) {
+    // Create a div element for the dropdown
+    var dropdown = document.createElement("div");
+    dropdown.className = "dropdown";
+    dropdown.id = id;
+
+    // Create a button element for the dropdown
+    var button = document.createElement("button");
+    button.className = "graph-image-btn"
+    button.innerHTML = id;
+    button.onclick = function() {
+        // Toggle the show class on the dropdown element
+        dropdown.classList.toggle("show");
+    };
+
+    // Create a div element for the dropdown content
+    var content = document.createElement("div");
+    content.className = "dropdown-content-img";
+
+    // Create a table element for the table data
+    var image = document.createElement("img");
+
+    image.src = data;
+
+    // Append the table to the content
+    content.appendChild(image);
 
     // Append the button and the content to the dropdown
     dropdown.appendChild(button);

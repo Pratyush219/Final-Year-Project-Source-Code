@@ -59,14 +59,17 @@
   color: black;
   display: flex;
   justify-content: center;
-  align-items: center;
+  min-height: 100vh;
+  height: fit-content;
 }
 .right {
   flex: 1;
   background-color: #aaa;
   display: flex;
   justify-content: center;
-  align-items: center;
+  width: 50vh;
+  min-height: 100vh;
+  height: fit-content;
 }
 .centered {
   text-align: center;
@@ -121,6 +124,7 @@ h1 {
   position: relative;
   width: 80%; /* Change this from 30% to 80% */
   min-width: 50vw; /* Add this property to set the minimum width to 50% of the viewport width */
+  max-width: 50vw;
   margin: 1em; /* Change this from 10px to 1em */
 }
 
@@ -133,6 +137,11 @@ h1 {
   background-color: #f0f0f0;
   color: #333;
   cursor: pointer;
+  max-width: 50vw;
+}
+
+button.graph-image-btn {
+  width: 60%;
 }
 
 /* Style the dropdown content elements */
@@ -141,6 +150,17 @@ h1 {
   top: 3em; /* Change this from 40px to 3em */
   left: 0;
   width: 100%;
+  display: none;
+  overflow-y: auto;
+  max-height: 20em; /* Change this from 300px to 20em */
+  border: 1px solid #ccc;
+}
+
+.dropdown-content-img {
+  position: relative; /* Change this from absolute to relative */
+  top: 3em; /* Change this from 40px to 3em */
+  left: 10em;
+  width: 60%;
   display: none;
   overflow-y: auto;
   max-height: 20em; /* Change this from 300px to 20em */
@@ -160,7 +180,26 @@ h1 {
   border-bottom: 1px solid #ccc;
 }
 
+.dropdown-content-img img {
+  width: 60%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
 /* Show the dropdown content when the button is clicked */
 .dropdown.show .dropdown-content {
   display: block;
+}
+
+.dropdown.show .dropdown-content-img {
+  display: block;
+}
+
+.container-right{
+  width: 100%;
+}
+
+.split-container{
+  min-height: 100vh;
+  height: fit-content;
 }
