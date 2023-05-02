@@ -102,7 +102,8 @@ def modified_apriori_features(filename):
     json_object = json.dumps(input_dict)
 
     # Print the JSON object as a string
-    pprint.pprint(json_object)
+    #pprint.pprint(json_object)
+    print(json_object)
     return features_dict, final_features, lifts
 
 if __name__ == '__main__':

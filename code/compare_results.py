@@ -5,33 +5,37 @@ import time
 import sys
 
 filename = sys.argv[1]
-# start_time = time.time()
-# result1, lifts1 = standard_apriori_features(filename)
-# end_time1 = time.time()
+start_time = time.time()
+standard_unreduced_features, lifts1 = standard_apriori_features(filename)
+end_time1 = time.time()
 # print(result1)
-# start_time2 = time.time()
+start_time2 = time.time()
 unreduced_features, reduced_features, lifts2 = modified_apriori_features(filename)
-# end_time2 = time.time()
+end_time2 = time.time()
 # print(result2)
 
 # print('Result1: ', result1)
 # print('Result2: ', reduced_features)
 
-# # calculate the runtime of each function
-# runtime1 = end_time1 - start_time
-# runtime2 = end_time2 - start_time2
+# calculate the runtime of each function
+runtime1 = end_time1 - start_time
+runtime2 = end_time2 - start_time2
 
-# # create a bar graph to compare the runtimes
-# functions = ['Standard Apriori', 'Modified Apriori']
-# runtimes = [runtime1, runtime2]
+# create a bar graph to compare the runtimes
+functions = ['Standard Apriori', 'Modified Apriori']
+runtimes = [runtime1, runtime2]
 
-# plt.figure()
-# plt.bar(functions, runtimes)
-# plt.title('Comparison of Function Runtimes')
-# plt.xlabel('Functions')
-# plt.ylabel('Runtime (s)')
+plt.figure()
+plt.bar(functions, runtimes)
+plt.title('Comparison of Function Runtimes')
+plt.xlabel('Functions')
+plt.ylabel('Runtime (s)')
 
-# plt.savefig('runtime.jpg')
+plt.savefig('public/runtime.jpg')
+
+count_length_standard_unreduced = []
+for keys in standard_unreduced_features:
+    count_length_standard_unreduced.append(len(standard_unreduced_features[keys]))
 
 count_length_unreduced = []
 for keys in unreduced_features:
@@ -45,9 +49,11 @@ for keys in reduced_features:
 print(class_label)
 x_values1 = []
 x_values2 = []
+x_values_standard = []
 for i in range(len(class_label)):
     x_values1.append(i+1)
     x_values2.append(i+1+len(class_label))
+    x_values_standard.append(i+1)
 
 plt.figure()
 plt.bar(x_values1, count_length_unreduced, color='red')
@@ -63,6 +69,14 @@ for i in range(len(x_values1)):
 for i in range(len(x_values2)):
     plt.text(x=x_values2[i], y=count_length_reduced[i], s=class_label[i], ha='center')
 
-plt.savefig('features.jpg')
-# plt.savefig('my_plot.png')
+plt.savefig('public/features.jpg')
+
+plt.figure()
+plt.bar(x_values_standard,count_length_standard_unreduced,color='orange')
+plt.xlabel('Linear Spacing')
+plt.ylabel('Number of features')
+plt.title('Dataset is ' + filename.split('.')[0])
+for i in range(len(x_values_standard)):
+    plt.text(x=x_values_standard[i], y=count_length_standard_unreduced[i], s=class_label[i], ha='center')
+plt.savefig('public/standard.png')
 # plt.show()
