@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 from standard_apriori import standard_apriori_features
 from modified_apriori import modified_apriori_features
 import time
+import sys
 
-filename = 'heart.csv'
+filename = sys.argv[1]
 # start_time = time.time()
 # result1, lifts1 = standard_apriori_features(filename)
 # end_time1 = time.time()
@@ -53,15 +54,15 @@ plt.bar(x_values1, count_length_unreduced, color='red')
 plt.bar(x_values2, count_length_reduced, color='green')
 plt.xlabel('Linear Spacing')
 plt.ylabel('Number of features')
-plt.title('Dataset length is 700')
-plt.savefig('features.jpg')
+plt.title('Dataset is ' + filename.split('.')[0])
 
 # Add text labels to the bars
 for i in range(len(x_values1)):
     plt.text(x=x_values1[i], y=count_length_unreduced[i], s=class_label[i], ha='center')
 
 for i in range(len(x_values2)):
-    plt.text(x=x_values2[i], y=count_length_reduced[i], s=class_label[i], ha='center', va='top')
+    plt.text(x=x_values2[i], y=count_length_reduced[i], s=class_label[i], ha='center')
 
+plt.savefig('features.jpg')
 # plt.savefig('my_plot.png')
 # plt.show()
