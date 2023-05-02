@@ -35,14 +35,14 @@ def print_table(T, supp_count):
     print()
 def standard_apriori_features(filename):
     path_to_data = '../data/' + filename
-    min_support = 0.3
-    min_confidence = 0.2
+    min_support = 0.01
+    min_confidence = 0.01
 
     data = load_data(path_to_data)
     class_labels = set(data[data.columns[-1]])
     order = [col for col in data.columns]
     transformed_data = get_label_appended_data(data)
-    print(class_labels)
+    # print(class_labels)
 
     transactions = transformed_data.to_numpy()
     # print(transactions)

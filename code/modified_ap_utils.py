@@ -211,8 +211,6 @@ def generate_features(rules, columns, class_labels):
     for class_label in class_labels:
         features_dict[str(class_label)] = set()
         conf_rules_right[str(class_label)] = []
-    print(features_dict)
-    print(conf_rules_right)
     for rule in rules:
         # Check if the consequent consists of exactly one item and that is a value corresponding to the Outcome field. If yes, then the antecedent is one of the features
         cell = ordered_itemset(rule.right, columns)[-1].split(',')

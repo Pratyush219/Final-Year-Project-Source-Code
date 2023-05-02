@@ -34,7 +34,7 @@ def modified_apriori_features(filename):
     # print('Data loaded')
     order = [col for col in data.columns]
     class_labels = set(data[data.columns[-1]])
-    print(class_labels)
+    # print(class_labels)
     transformed_data = get_label_appended_data(data)
     transactions = transformed_data.to_numpy()
     # print(transactions)
@@ -103,7 +103,7 @@ def modified_apriori_features(filename):
 
     # Print the JSON object as a string
     pprint.pprint(json_object)
-    return final_features, lifts
+    return features_dict, final_features, lifts
 
 if __name__ == '__main__':
     modified_apriori_features(sys.argv[1])
