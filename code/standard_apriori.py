@@ -36,7 +36,7 @@ def print_table(T, supp_count):
 def standard_apriori_features(filename):
     path_to_data = '../data/' + filename
     min_support = 0.02
-    min_confidence = 0.03
+    min_confidence = 0.02
 
     data = load_data(path_to_data)
     class_labels = set(data[data.columns[-1]])

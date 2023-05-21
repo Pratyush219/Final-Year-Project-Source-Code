@@ -26,7 +26,8 @@ functions = ['Standard Apriori', 'Modified Apriori']
 runtimes = [runtime1, runtime2]
 
 plt.figure()
-plt.bar(functions, runtimes)
+plt.bar(functions[0], runtimes[0], color='blue')
+plt.bar(functions[1], runtimes[1], color='orange')
 plt.title('Comparison of Function Runtimes')
 plt.xlabel('Functions')
 plt.ylabel('Runtime (s)')
@@ -72,7 +73,7 @@ for i in range(len(x_values2)):
 plt.savefig('public/features.jpg')
 
 plt.figure()
-plt.bar(x_values_standard,count_length_standard_unreduced,color='orange')
+plt.bar(x_values_standard,count_length_standard_unreduced,color='#021096')
 plt.xlabel('Linear Spacing')
 plt.ylabel('Number of features')
 plt.title('Dataset is ' + filename.split('.')[0])

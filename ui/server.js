@@ -26,6 +26,20 @@ app.get('/datasets', (req, res) => {
 });
 
 app.get('/results/:file', (req, res) => {
+    const directory = __dirname+"/public"
+    fs.readdir(directory, (err, files) => {
+        if (err) throw err;
+      
+        for (const file of files) {
+            if(file.endsWith(".png") || file.endsWith(".jpg") || file.endsWith(".jpeg")){
+                console.log("TRUE!");
+                fs.unlink(path.join(directory, file), (err) => {
+                    if (err) throw err;
+                });
+            }
+        }
+      });
+
     let fileName = req.params['file']
     let options = {args: [fileName]}
     console.log('Running');

@@ -59,6 +59,8 @@ window.onload = () => {
                                 })
                             fetch('/compare_results/'+file)
                             .then(response => {
+                                console.log(response)
+                                console.log('Plotting graphs');
                                 var graphs = {
                                     "Features: Unreduced v/s Reduced": "features.jpg",
                                     "Features: Standard Apriori": "standard.png",
