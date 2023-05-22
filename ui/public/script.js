@@ -61,10 +61,11 @@ window.onload = () => {
                             .then(response => {
                                 console.log(response)
                                 console.log('Plotting graphs');
+                                const folder = file.split('.')[0];
                                 var graphs = {
-                                    "Features: Unreduced v/s Reduced": "features.jpg",
-                                    "Features: Standard Apriori": "standard.png",
-                                    "Runtime": "runtime.jpg"
+                                    "Features: Unreduced v/s Reduced": folder + "/features.jpg",
+                                    "Features: Standard Apriori": folder + "/standard.png",
+                                    "Runtime": folder + "/runtime.jpg"
                                 }
                                 show_graphs(graphs)
                             })

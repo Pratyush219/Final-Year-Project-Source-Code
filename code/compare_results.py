@@ -3,8 +3,14 @@ from standard_apriori import standard_apriori_features
 from modified_apriori import modified_apriori_features
 import time
 import sys
+import os
 
+print(os.getcwd())
 filename = sys.argv[1]
+directoryPath = 'public/' + filename.split('.')[0]
+if not os.path.exists(directoryPath):
+    os.makedirs(directoryPath)
+
 start_time = time.time()
 standard_unreduced_features, lifts1 = standard_apriori_features(filename)
 end_time1 = time.time()
@@ -32,7 +38,7 @@ plt.title('Comparison of Function Runtimes')
 plt.xlabel('Functions')
 plt.ylabel('Runtime (s)')
 
-plt.savefig('public/runtime.jpg')
+plt.savefig(directoryPath + '/runtime.jpg')
 
 count_length_standard_unreduced = []
 for keys in standard_unreduced_features:
@@ -61,7 +67,7 @@ plt.bar(x_values1, count_length_unreduced, color='red')
 plt.bar(x_values2, count_length_reduced, color='green')
 plt.xlabel('Linear Spacing')
 plt.ylabel('Number of features')
-plt.title('Dataset is ' + filename.split('.')[0])
+plt.title('Dataset is ' + directoryPath)
 
 # Add text labels to the bars
 for i in range(len(x_values1)):
@@ -70,7 +76,7 @@ for i in range(len(x_values1)):
 for i in range(len(x_values2)):
     plt.text(x=x_values2[i], y=count_length_reduced[i], s=class_label[i], ha='center')
 
-plt.savefig('public/features.jpg')
+plt.savefig(directoryPath + '/features.jpg')
 
 plt.figure()
 plt.bar(x_values_standard,count_length_standard_unreduced,color='#021096')
@@ -79,5 +85,5 @@ plt.ylabel('Number of features')
 plt.title('Dataset is ' + filename.split('.')[0])
 for i in range(len(x_values_standard)):
     plt.text(x=x_values_standard[i], y=count_length_standard_unreduced[i], s=class_label[i], ha='center')
-plt.savefig('public/standard.png')
+plt.savefig(directoryPath + '/standard.png')
 # plt.show()
